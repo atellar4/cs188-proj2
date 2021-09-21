@@ -74,7 +74,34 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        # 1. Consider the distance to the nearest food; reciprocal dist. to food weigh more than that to ghost
+        # 2. Consider the score
+        # 3. Consider food left, more points if less food afterwards
+        # 4. Consider a penalty (deduct a lot of points) for nearby ghosts
+        # use the getScore() function
+
+        # manhattan distance btw new pacman position and closest new ghost position .getGhostPosition()
+        # manhattan dist. to closest food, - points?
+        # + points if new pac pos has food
+        # + points if decrease amount of food left; len(newFood.asList()) vs. len(currFood.asList())
+        # - points if manhattan distance to ghost very close
+        # + points if manhattan distance < newscaredtime, then can eat ghost
+        
+        score = 0 # add to successorGameState.getScore()
+
+        min_manhat_food_dist = 1000000000000
+        newFood_list = newFood.asList()
+        for newFoodPos in newFood_list:
+            curr_dist = util.manhattanDistance(newPos, newFoodPos)
+            if curr_dist < min_manhat_food_dist:
+                min_manhat_food_dist = curr_dist
+        if len(newFood_list) > 0:
+            score -= min_manhat_food_dist
+        
+        if len(newFood_list) < len(currentGameState.getFood().asList()):
+            score += 100
+        
+        return successorGameState.getScore() + score
 
 def scoreEvaluationFunction(currentGameState):
     """
