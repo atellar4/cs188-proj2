@@ -161,8 +161,44 @@ class MinimaxAgent(MultiAgentSearchAgent):
         gameState.isLose():
         Returns whether or not the game state is a losing state
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # Minimax Agent - adversarial search agent 
+        # Minimax agent should work with any number of ghosts
+        # Minimax tree will have multiple min layers (one for each ghost) for every max layer
+
+        # Goal:
+            # Find the optimal move at each state for PacMan (maximizer) against the ghosts (minimizers)
+        
+        # 1. Check if the current game state is a winning state or a losing state
+        # 2. Check if it is Pacman's turn
+            # For every possible action, recurse using minimax alg. to get the maximum reward
+        # 3. Check if it is the ghosts' (>=1) turn
+            # Get the number of agents in the game
+            # For every agent, recurse using minimax alg. to get the minimum reward for the ghosts
+                # If all the agents moved -> add 1 to the depth and change the agent's index to 0 to signify PacMan's turn
+
+        def minimax_algorithm(depth, agentIndex, gameState):
+            
+            if (gameState.isWin() or gameState.isLose()):
+                return scoreEvaluationFunction(gameState)
+
+            if (agentIndex == 0): # PacMan's turn
+                # PacMan's turn
+                for pacMan_possible_action in gameState.getLegalActions(0):
+                    return max(minimax_algorithm(depth, 1, gameState.generateSuccessor(agentIndex, pacMan_possible_action))) #buggy
+
+            if (agentIndex == 1): # Ghost's turn
+                nextGhostIndex = 1 + self.index
+
+                if (nextGhostIndex == gameState.getNumAgents()): # Check if we checked all the ghosts
+                    nextGhostIndex = 0 # It's now PacMan's turn
+                
+                if (nextGhostIndex == 0): # If all the ghosts moved..
+                    depth += 1 # check the next min layer
+
+                for ghost_possible_action in gameState.getLegalActions(self.index):
+                    return min(minimax_algorithm(depth, 0, gameState.generateSuccessor(nextGhostIndex, ghost_possible_action))) #buggy
+
+        minimax_algorithm(0, self.index, gameState)
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
