@@ -181,7 +181,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
         def minimax_algorithm(depth, agentIndex, gameState):
             
-            if (gameState.isWin() or gameState.isLose()):
+            if (gameState.isWin() or gameState.isLose() or depth == self.depth):
                 score = self.evaluationFunction(gameState)
                 return ['', score]
                 #return scoreEvaluationFunction(gameState)
@@ -203,7 +203,11 @@ class MinimaxAgent(MultiAgentSearchAgent):
                     depth += 1 # check the next min layer
                 v_for_min = ['', float('inf')]
                 for ghost_possible_action in gameState.getLegalActions(agentIndex):
-                    v_for_min = min(v_for_min, [ghost_possible_action, minimax_algorithm(depth, agentIndex + 1, gameState.generateSuccessor(nextGhostIndex, ghost_possible_action))]) #buggy
+                    if nextGhostIndex == 0:
+                        v_for_min = min(v_for_min, [ghost_possible_action, minimax_algorithm(depth, nextGhostIndex, gameState.generateSuccessor(agentIndex, ghost_possible_action))])
+                    else:
+                        v_for_min = min(v_for_min, [ghost_possible_action, minimax_algorithm(depth, agentIndex + 1, gameState.generateSuccessor(agentIndex, ghost_possible_action))]) #buggy
+
                 return v_for_min
 
         minimax_action, _ = minimax_algorithm(0, self.index, gameState)
