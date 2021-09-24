@@ -226,7 +226,6 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         Returns the minimax action using self.depth and self.evaluationFunction
         """
-        "*** YOUR CODE HERE ***"
         def alphabeta_algorithm(depth, agentIndex, gameState, alpha, beta):
             
             if (gameState.isWin() or gameState.isLose() or depth == self.depth):
@@ -288,8 +287,45 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         All ghosts should be modeled as choosing uniformly at random from their
         legal moves.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        def expectimax_action(depth, agentIndex, gameState):
+            
+            if (gameState.isWin() or gameState.isLose() or depth == self.depth):
+                score = self.evaluationFunction(gameState)
+                return ['', score]
+
+            if (agentIndex == 0): # PacMan's turn
+                # PacMan's turn
+                v_for_max = ['', float('-inf')]
+                for pacMan_possible_action in gameState.getLegalActions(0):
+                    poss_action_score = expectimax_action(depth, agentIndex + 1, gameState.generateSuccessor(agentIndex, pacMan_possible_action))[1]
+                    if poss_action_score > v_for_max[1]:
+                        v_for_max = [pacMan_possible_action, poss_action_score]
+                return v_for_max
+
+            if (agentIndex >= 1): # Ghost's turn
+                nextGhostIndex = 1 + agentIndex
+
+                if (nextGhostIndex == gameState.getNumAgents()): # Check if we checked all the ghosts
+                    nextGhostIndex = 0 # It's now PacMan's turn
+                
+                if (nextGhostIndex == 0): # If all the ghosts moved..
+                    depth += 1 # check the next min layer
+                
+                expectimax_for_min = ['', float('inf')]
+                avg_action_score = 0
+                for ghost_possible_action in gameState.getLegalActions(agentIndex):
+                    if nextGhostIndex == 0: 
+                        avg_action_score += expectimax_action(depth, nextGhostIndex, gameState.generateSuccessor(agentIndex, ghost_possible_action))[1]
+                        avg_action_score = avg_action_score / len(gameState.getLegalActions(agentIndex))
+                        expectimax_for_min = [ghost_possible_action, avg_action_score]
+                    else:
+                        avg_action_score += expectimax_action(depth, agentIndex + 1, gameState.generateSuccessor(agentIndex, ghost_possible_action))[1]
+                        avg_action_score = avg_action_score / len(gameState.getLegalActions(agentIndex))
+                        expectimax_for_min = [ghost_possible_action, avg_action_score]
+                return expectimax_for_min
+
+        expectimax_action, _ = expectimax_action(0, self.index, gameState)
+        return expectimax_action
 
 def betterEvaluationFunction(currentGameState):
     """
