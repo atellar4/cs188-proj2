@@ -287,6 +287,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         All ghosts should be modeled as choosing uniformly at random from their
         legal moves.
         """
+        
         def expectimax_action(depth, agentIndex, gameState):
             
             if (gameState.isWin() or gameState.isLose() or depth == self.depth):
@@ -311,17 +312,26 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
                 if (nextGhostIndex == 0): # If all the ghosts moved..
                     depth += 1 # check the next min layer
                 
-                expectimax_for_min = ['', float('inf')]
-                avg_action_score = 0
+                expectimax_for_min = ['', -1]
                 for ghost_possible_action in gameState.getLegalActions(agentIndex):
+                    avg_action_score = expectimax_for_min[1]
+
                     if nextGhostIndex == 0: 
                         avg_action_score += expectimax_action(depth, nextGhostIndex, gameState.generateSuccessor(agentIndex, ghost_possible_action))[1]
-                        avg_action_score = avg_action_score / len(gameState.getLegalActions(agentIndex))
+                        
+                        # error located here..?
+                        
+                        # avg_action_score = avg_action_score / len(gameState.getLegalActions(agentIndex))
+                        # if avg_action_score > expectimax_for_min[1]:
                         expectimax_for_min = [ghost_possible_action, avg_action_score]
+
                     else:
                         avg_action_score += expectimax_action(depth, agentIndex + 1, gameState.generateSuccessor(agentIndex, ghost_possible_action))[1]
                         avg_action_score = avg_action_score / len(gameState.getLegalActions(agentIndex))
-                        expectimax_for_min = [ghost_possible_action, avg_action_score]
+
+                        if avg_action_score > expectimax_for_min[1]:
+                            # print("avg action score ", avg_action_score)
+                            expectimax_for_min = [ghost_possible_action, avg_action_score]
                 return expectimax_for_min
 
         expectimax_action, _ = expectimax_action(0, self.index, gameState)
