@@ -176,29 +176,38 @@ class MinimaxAgent(MultiAgentSearchAgent):
             # For every agent, recurse using minimax alg. to get the minimum reward for the ghosts
                 # If all the agents moved -> add 1 to the depth and change the agent's index to 0 to signify PacMan's turn
 
+        # buggy because we were only passing 1 arg into min and max
+        #not returning anything, need to return an action, keep track of [action, score]
+
         def minimax_algorithm(depth, agentIndex, gameState):
             
             if (gameState.isWin() or gameState.isLose()):
-                return scoreEvaluationFunction(gameState)
+                score = self.evaluationFunction(gameState)
+                return ['', score]
+                #return scoreEvaluationFunction(gameState)
 
             if (agentIndex == 0): # PacMan's turn
                 # PacMan's turn
+                v_for_max = ['', float('-inf')]
                 for pacMan_possible_action in gameState.getLegalActions(0):
-                    return max(minimax_algorithm(depth, 1, gameState.generateSuccessor(agentIndex, pacMan_possible_action))) #buggy
+                    v_for_max = max(v_for_max, [pacMan_possible_action, minimax_algorithm(depth, agentIndex + 1, gameState.generateSuccessor(agentIndex, pacMan_possible_action))]) #buggy
+                return v_for_max
 
-            if (agentIndex == 1): # Ghost's turn
-                nextGhostIndex = 1 + self.index
+            if (agentIndex >= 1): # Ghost's turn
+                nextGhostIndex = 1 + agentIndex
 
                 if (nextGhostIndex == gameState.getNumAgents()): # Check if we checked all the ghosts
                     nextGhostIndex = 0 # It's now PacMan's turn
                 
                 if (nextGhostIndex == 0): # If all the ghosts moved..
                     depth += 1 # check the next min layer
+                v_for_min = ['', float('inf')]
+                for ghost_possible_action in gameState.getLegalActions(agentIndex):
+                    v_for_min = min(v_for_min, [ghost_possible_action, minimax_algorithm(depth, agentIndex + 1, gameState.generateSuccessor(nextGhostIndex, ghost_possible_action))]) #buggy
+                return v_for_min
 
-                for ghost_possible_action in gameState.getLegalActions(self.index):
-                    return min(minimax_algorithm(depth, 0, gameState.generateSuccessor(nextGhostIndex, ghost_possible_action))) #buggy
-
-        minimax_algorithm(0, self.index, gameState)
+        minimax_action, _ = minimax_algorithm(0, self.index, gameState)
+        return minimax_action
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
@@ -211,6 +220,26 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
         util.raiseNotDefined()
+
+    def maxValue(self, depth, agentIndex, state, alpha, beta):
+        v = float('-inf')
+        # for each successor of state:
+        #   v = max(v, value(successor, alpha, beta))
+        #   if v > beta:
+        #       return v
+        #   alpha = max(alpha, v)
+        # return v
+        return
+
+    def minValue(self, depth, agentIndex, state, alpha, beta):
+        v = float('inf')
+        # for each successor of state:
+        #   v = min(v, value(successor, alpha, beta))
+        #   if v < alpha:
+        #       return v
+        #   beta = min(beta, v)
+        # return v
+        return
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
