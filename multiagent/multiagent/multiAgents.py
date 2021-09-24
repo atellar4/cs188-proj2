@@ -184,7 +184,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
             if (gameState.isWin() or gameState.isLose() or depth == self.depth):
                 score = self.evaluationFunction(gameState)
                 return ['', score]
-                #return scoreEvaluationFunction(gameState)
 
             if (agentIndex == 0): # PacMan's turn
                 # PacMan's turn
@@ -228,27 +227,54 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        def alphabeta_algorithm(depth, agentIndex, gameState, alpha, beta):
+            
+            if (gameState.isWin() or gameState.isLose() or depth == self.depth):
+                score = self.evaluationFunction(gameState)
+                return ['', score]
 
-    def maxValue(self, depth, agentIndex, state, alpha, beta):
-        v = float('-inf')
-        # for each successor of state:
-        #   v = max(v, value(successor, alpha, beta))
-        #   if v > beta:
-        #       return v
-        #   alpha = max(alpha, v)
-        # return v
-        return
+            if (agentIndex == 0): # PacMan's turn
+                # PacMan's turn
+                v_for_max = ['', float('-inf')]
+                for pacMan_possible_action in gameState.getLegalActions(0):
+                    poss_action_score = alphabeta_algorithm(depth, agentIndex + 1, gameState.generateSuccessor(agentIndex, pacMan_possible_action), alpha, beta)[1]
+                    if poss_action_score > v_for_max[1]:
+                        v_for_max = [pacMan_possible_action, poss_action_score]
+                    if v_for_max[1] > beta:
+                        return v_for_max
+                    alpha = max(alpha, v_for_max[1])
+                return v_for_max
 
-    def minValue(self, depth, agentIndex, state, alpha, beta):
-        v = float('inf')
-        # for each successor of state:
-        #   v = min(v, value(successor, alpha, beta))
-        #   if v < alpha:
-        #       return v
-        #   beta = min(beta, v)
-        # return v
-        return
+            if (agentIndex >= 1): # Ghost's turn
+                nextGhostIndex = 1 + agentIndex
+
+                if (nextGhostIndex == gameState.getNumAgents()): # Check if we checked all the ghosts
+                    nextGhostIndex = 0 # It's now PacMan's turn
+                
+                if (nextGhostIndex == 0): # If all the ghosts moved..
+                    depth += 1 # check the next min layer
+                v_for_min = ['', float('inf')]
+                for ghost_possible_action in gameState.getLegalActions(agentIndex):
+                    if nextGhostIndex == 0:
+                        poss_action_score = alphabeta_algorithm(depth, nextGhostIndex, gameState.generateSuccessor(agentIndex, ghost_possible_action), alpha, beta)[1]
+                        if poss_action_score < v_for_min[1]:
+                            v_for_min = [ghost_possible_action, poss_action_score]
+                        if v_for_min[1] < alpha:
+                            return v_for_min
+                        beta = min(beta, v_for_min[1])
+                    else:
+                        poss_action_score = alphabeta_algorithm(depth, agentIndex + 1, gameState.generateSuccessor(agentIndex, ghost_possible_action), alpha, beta)[1]
+                        if poss_action_score < v_for_min[1]:
+                            v_for_min = [ghost_possible_action, poss_action_score]
+                        if v_for_min[1] < alpha:
+                            return v_for_min
+                        beta = min(beta, v_for_min[1])
+                return v_for_min
+
+        alpha = float('-inf')
+        beta = float('inf')
+        alphabeta_action, _ = alphabeta_algorithm(0, self.index, gameState, alpha, beta)
+        return alphabeta_action
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
