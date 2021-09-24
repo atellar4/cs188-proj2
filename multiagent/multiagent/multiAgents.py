@@ -313,27 +313,18 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
                     depth += 1 # check the next min layer
                 
                 expectimax_for_min = ['', 0]
-                #expectimax_for_min = ['', -1]
+
                 for ghost_possible_action in gameState.getLegalActions(agentIndex):
                     avg_action_score = expectimax_for_min[1]
 
                     if nextGhostIndex == 0: 
                         avg_action_score += (expectimax_action(depth, nextGhostIndex, gameState.generateSuccessor(agentIndex, ghost_possible_action))[1] / len(gameState.getLegalActions(agentIndex)))
-                        
-                        # error located here..?
-                        
-                        # avg_action_score = avg_action_score / len(gameState.getLegalActions(agentIndex))
-                        # if avg_action_score > expectimax_for_min[1]:
                         expectimax_for_min = [ghost_possible_action, avg_action_score]
 
                     else:
                         avg_action_score += (expectimax_action(depth, agentIndex + 1, gameState.generateSuccessor(agentIndex, ghost_possible_action))[1] / len(gameState.getLegalActions(agentIndex)))
-        
-                        # avg_action_score += expectimax_action(depth, agentIndex + 1, gameState.generateSuccessor(agentIndex, ghost_possible_action))[1]
-                        # avg_action_score = avg_action_score / len(gameState.getLegalActions(agentIndex))
 
                         if avg_action_score > expectimax_for_min[1]:
-                            # print("avg action score ", avg_action_score)
                             expectimax_for_min = [ghost_possible_action, avg_action_score]
                 return expectimax_for_min
 
@@ -347,8 +338,7 @@ def betterEvaluationFunction(currentGameState):
 
     DESCRIPTION: <write something here so we know what you did>
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
-
+    return scoreEvaluationFunction(currentGameState)
+    
 # Abbreviation
 better = betterEvaluationFunction
