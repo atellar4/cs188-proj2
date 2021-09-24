@@ -190,7 +190,9 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 # PacMan's turn
                 v_for_max = ['', float('-inf')]
                 for pacMan_possible_action in gameState.getLegalActions(0):
-                    v_for_max = max(v_for_max, [pacMan_possible_action, minimax_algorithm(depth, agentIndex + 1, gameState.generateSuccessor(agentIndex, pacMan_possible_action))]) #buggy
+                    poss_action_score = minimax_algorithm(depth, agentIndex + 1, gameState.generateSuccessor(agentIndex, pacMan_possible_action))[1]
+                    if poss_action_score > v_for_max[1]:
+                        v_for_max = [pacMan_possible_action, poss_action_score]
                 return v_for_max
 
             if (agentIndex >= 1): # Ghost's turn
@@ -204,10 +206,13 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 v_for_min = ['', float('inf')]
                 for ghost_possible_action in gameState.getLegalActions(agentIndex):
                     if nextGhostIndex == 0:
-                        v_for_min = min(v_for_min, [ghost_possible_action, minimax_algorithm(depth, nextGhostIndex, gameState.generateSuccessor(agentIndex, ghost_possible_action))])
+                        poss_action_score = minimax_algorithm(depth, nextGhostIndex, gameState.generateSuccessor(agentIndex, ghost_possible_action))[1]
+                        if poss_action_score < v_for_min[1]:
+                            v_for_min = [ghost_possible_action, poss_action_score]
                     else:
-                        v_for_min = min(v_for_min, [ghost_possible_action, minimax_algorithm(depth, agentIndex + 1, gameState.generateSuccessor(agentIndex, ghost_possible_action))]) #buggy
-
+                        poss_action_score = minimax_algorithm(depth, agentIndex + 1, gameState.generateSuccessor(agentIndex, ghost_possible_action))[1]
+                        if poss_action_score < v_for_min[1]:
+                            v_for_min = [ghost_possible_action, poss_action_score]
                 return v_for_min
 
         minimax_action, _ = minimax_algorithm(0, self.index, gameState)
