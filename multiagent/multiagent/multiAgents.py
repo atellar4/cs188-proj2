@@ -336,9 +336,38 @@ def betterEvaluationFunction(currentGameState):
     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
     evaluation function (question 5).
 
-    DESCRIPTION: <write something here so we know what you did>
+    DESCRIPTION: 
+        # 1. Consider the distance to the nearest food; reciprocal dist. to food weigh more than that to ghost
+        # 2. Consider the score
+        # 3. Consider food left, more points if less food afterwards
+        # 4. Consider a penalty (deduct a lot of points) for nearby ghosts
+        # use the getScore() function
+
+        # manhattan distance btw new pacman position and closest new ghost position .getGhostPosition()
+        # manhattan dist. to closest food, - points?
+        # + points if new pac pos has food
+        # + points if decrease amount of food left; len(newFood.asList()) vs. len(currFood.asList())
+        # - points if manhattan distance to ghost very close
+        # + points if manhattan distance < newscaredtime, then can eat ghost
     """
-    return scoreEvaluationFunction(currentGameState)
+    score = 0
+
+    currPos = currentGameState.getPacmanPosition()
+    currFoodList = currentGameState.getFood().asList()
+
+    min_manhat_food_dist = 1000000000000
+    for currFood in currFoodList:
+        curr_dist = util.manhattanDistance(currPos, currFood)
+        if curr_dist < min_manhat_food_dist:
+            min_manhat_food_dist = curr_dist
+
+    if len(currFoodList) > 0:
+        score -= min_manhat_food_dist
+    
+    if len(currFoodList) < len(currentGameState.getFood().asList()):
+        score += 100
+
+    return score + currentGameState.getScore()
     
 # Abbreviation
 better = betterEvaluationFunction
